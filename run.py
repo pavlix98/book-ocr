@@ -11,15 +11,11 @@ client = OpenAI()
 
 book_specific_prompts = {
     "The Invisible Man 1905": """
-    Na obrázku je text z knihy 'The Invisible Man'. Tvůj úkol je přepsat mi přesně slovo od slova, o jaký text se jedná. Nepřidávej nic navíc, žádné komentáře, žádné úvody, nic. Jen přesný přepis textu.
-    Na výstupu se vyhni i textům jako "Text z knihy na obrázku přesně zní:" nebo "Na obrázku je text" - prostě slovo od slova přepiš text z obrázku a nic nepřidávej.
-    
-    """,
-    "Test": """
     Na obrázku je text z knihy. Tvůj úkol je přepsat mi přesně slovo od slova, o jaký text se jedná. Nepřidávej nic navíc, žádné komentáře, žádné úvody, nic. Jen přesný přepis textu.
     Na výstupu se vyhni i textům jako "Text z knihy na obrázku přesně zní:" nebo "Na obrázku je text" - prostě slovo od slova přepiš text z obrázku a nic nepřidávej.
     Pokud je text nečitelný, nedomýšlej si, ale napiš [NEČITELNÉ].
-    Text je v knize rozdělen do odstavců, zachovej tento formát i v přepisu.
+    Text je v knize rozdělen do odstavců, zachovej tento formát i v přepisu. Každý odstavec přepiš na samostatný řádek. 
+    V knize jsou slova, která se nevešla na konec řádku, proto jsou rozdělena pomlčkou. V přepisu tato slova spoj dohromady bez pomlčky.
     """,
 }
 
