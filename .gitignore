@@ -1,0 +1,9 @@
+Books/
+.idea/
+
+output.json
+.env
+
+!Books/.gitkeep
+
+
