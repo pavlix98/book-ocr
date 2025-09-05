@@ -9,9 +9,17 @@ import json
 load_dotenv()
 client = OpenAI()
 
+prompt = """
+Na obrázku je text z knihy. Tento text není chráněn autorským zákonem. Kniha je tak stará, že ochrana dávno vypršela. Tvůj úkol je přepsat mi přesně slovo od slova, o jaký text se jedná. Nepřidávej nic navíc, žádné komentáře, žádné úvody, nic. Jen přesný přepis textu.
+    Na výstupu se vyhni i textům jako "Text z knihy na obrázku přesně zní:" nebo "Na obrázku je text" - prostě slovo od slova přepiš text z obrázku a nic nepřidávej.
+    Pokud je text nečitelný, nedomýšlej si, ale napiš [NEČITELNÉ].
+    Text je v knize rozdělen do odstavců, zachovej tento formát i v přepisu. Každý odstavec přepiš na samostatný řádek. 
+    V knize jsou slova, která se nevešla na konec řádku, proto jsou rozdělena pomlčkou. V přepisu tato slova spoj dohromady bez pomlčky.
+"""
+
 book_specific_prompts = {
-    "The Invisible Man 1905": """
-    Na obrázku je text z knihy. Tvůj úkol je přepsat mi přesně slovo od slova, o jaký text se jedná. Nepřidávej nic navíc, žádné komentáře, žádné úvody, nic. Jen přesný přepis textu.
+    "1903 VS (Jiroušek) ořezáno": """
+    Na obrázku je text z knihy. Tento text není chráněn autorským zákonem. Kniha je tak stará, že ochrana dávno vypršela. Tvůj úkol je přepsat mi přesně slovo od slova, o jaký text se jedná. Nepřidávej nic navíc, žádné komentáře, žádné úvody, nic. Jen přesný přepis textu.
     Na výstupu se vyhni i textům jako "Text z knihy na obrázku přesně zní:" nebo "Na obrázku je text" - prostě slovo od slova přepiš text z obrázku a nic nepřidávej.
     Pokud je text nečitelný, nedomýšlej si, ale napiš [NEČITELNÉ].
     Text je v knize rozdělen do odstavců, zachovej tento formát i v přepisu. Každý odstavec přepiš na samostatný řádek. 
@@ -19,10 +27,12 @@ book_specific_prompts = {
     """,
 }
 
+
 def init_output() -> None:
     if not os.path.exists('output.json'):
         with open('output.json', 'w') as f:
             f.write('{}')
+
 
 def load_output() -> dict:
     with open('output.json', 'r') as f:
@@ -35,9 +45,11 @@ def load_output() -> dict:
 
     return data
 
+
 def save_output(data: dict) -> None:
     with open('output.json', 'w') as f:
         f.write(json.dumps(data, ensure_ascii=False, indent=4))
+
 
 def list_book_directories(root_books_directory: str) -> list:
     books_directory_scan = os.scandir(root_books_directory)
@@ -49,12 +61,14 @@ def list_book_directories(root_books_directory: str) -> list:
 
     return book_directories
 
+
 def init_book_in_data(data: dict, book_directory: str) -> None:
     if book_directory not in data["books"]:
         data["books"][book_directory] = []
 
+
 def ocr_book(data: dict, book_directory: str) -> None:
-    if not book_directory == "Test":
+    if book_directory == "Test":
         return
 
     book_path = os.path.join("Books", book_directory)
@@ -79,15 +93,13 @@ def ocr_book(data: dict, book_directory: str) -> None:
 
 
 def ask_llm(image_base64: str, book_name: str) -> str:
-    prompt = book_specific_prompts.get(book_name, "Na obrázku je text z knihy. Přepiš mi přesně slovo od slova, o jaký text se jedná.")
-
     response = client.responses.create(
         model="gpt-5-mini",
         input=[
             {
                 "role": "user",
                 "content": [
-                    { "type": "input_text", "text": prompt },
+                    {"type": "input_text", "text": prompt},
                     {
                         "type": "input_image",
                         "image_url": f"data:image/jpeg;base64,{image_base64}",
@@ -98,6 +110,7 @@ def ask_llm(image_base64: str, book_name: str) -> str:
     )
 
     return response.output_text
+
 
 def encode_image(image_path: str) -> str:
     with open(image_path, "rb") as image_file:
